@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<style>
+div {
+    float: right; 
+    width: 256px; 
+    height: 256px;
+    margin: 15px;
+    padding: 10px;
+    border: 1px solid #aaaaaa;
+}
+</style>
+<body bgcolor="#E6E6FA">
+<script>
+var commentBox = document.createElement("textArea");
+commentBox.setAttribute("id","CommentBox");
+commentBox.setAttribute("form","CommentForm");
+commentBox.setAttribute("name","comment");
+commentBox.setAttribute("rows","5");
+commentBox.setAttribute("cols","50");
+document.body.appendChild(commentBox);
+
+var commentsForm = document.createElement("form");
+commentsForm.setAttribute("id","CommentForm");
+commentsForm.setAttribute("method","post");
+document.body.appendChild(commentsForm);
+
+var submitComment = document.createElement("input");
+submitComment.setAttribute("id","SubmitComment");
+submitComment.innerHTML = "Submit";
+submitComment.setAttribute("type","submit");
+commentsForm.appendChild(submitComment);
+
+</script>
+<script src="mainJS"></script>
+
+</body>
+</html>
+

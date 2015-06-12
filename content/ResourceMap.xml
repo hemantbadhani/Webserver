@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resourceMap>
+	<resource type="IMAGE_PNG">
+		<name>/favicon.ico</name>
+	<value>content/images/hunab-ku-152-64729.png</value>		
+	</resource>
+	<resource type="HTML_TEXT">
+		<name>/</name>
+		<value>content/index.html</value>		
+	</resource>
+	<resource type="HTML_TEXT">
+		<name>/mainJS</name>
+		<value>content/.main.js</value>		
+	</resource>	
+	<resource type="IMAGE_PNG">
+		<name>/cs</name>
+		<value>content/images/cs.png</value>		
+	</resource>
+	<resource type="IMAGE_PNG">
+		<name>/superman</name>
+		<value>content/images/superman.png</value>		
+	</resource>
+	<resource type="IMAGE_PNG">
+		<name>/spiderman</name>
+		<value>content/images/spiderman.png</value>		
+	</resource>
+	<resource type="IMAGE_PNG">
+		<name>/l</name>
+		<value>content/images/l-DeathNote.png</value>		
+	</resource>
+	<resource type="IMAGE_PNG">
+		<name>/gta</name>
+		<value>content/images/gta.png</value>		
+	</resource>
+	<resource type="IMAGE_PNG">
+		<name>/optical</name>
+		<value>content/images/simple-optical-effect-152-20732.png</value>		
+	</resource>	
+	<resource type="DB">
+		<name>/comments</name>
+		<value>content/.comments.xml</value>		
+	</resource>
+</resourceMap>
