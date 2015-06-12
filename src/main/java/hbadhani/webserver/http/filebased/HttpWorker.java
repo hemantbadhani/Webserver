@@ -10,10 +10,8 @@ import hbadhani.webserver.interfaces.Connection;
 
 import java.util.logging.Logger;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +25,7 @@ public class HttpWorker implements Runnable{
 	private final static String root = "/";
 	private final static String sitesPath = "sites";
 	private final static String rootPage = "index.html";
-	static Logger logger = Logger.getLogger("HttpWorker");
+	private final static Logger logger = Logger.getLogger("hbadhani.webserver.http.filebased.HttpWorker");
 
 	public HttpWorker(Connection connection)
 	{
@@ -45,8 +43,9 @@ public class HttpWorker implements Runnable{
 				logger.finer(httpReq.type.strVal + ":" + httpReq.url);
 				if(httpReq.type == HttpRequest.RequestType.GET || httpReq.type == HttpRequest.RequestType.HEAD){
 					processGetOrHeadRequest(httpReq);
-				}
-				else{
+				}else if(httpReq.type == HttpRequest.RequestType.POST){
+					processPostRequest(httpReq);
+				}else{
 					send501Unimplemented(httpReq);
 				}
 
@@ -161,47 +160,77 @@ public class HttpWorker implements Runnable{
 			if(httpReq.type == HttpRequest.RequestType.GET) {
 				copyStreamData(new FileInputStream(url.toString()), connection.getOutputStream());
 			}
+		}catch(Exception e){
+			logger.finer("Failed to process GET request for" + httpReq.url);
+		}
+	}
+	void processPostRequest(HttpRequest httpReq){
+		try {
+			String[] header = null;
+			String line = null;
+			long contentLength = 0;
+			long fileSize = 0;
+			long dataRead = 0;
 
-			/*if(resource != null){
-				long contentLength = 0;
-
-				if(resource.type.equalsIgnoreCase(HttpResource.ResourceType.HTML_TEXT.strVal))
+			while( null != (header = reader.readLine().split(" ")))
+			{
+				if(HttpResponse.Field.CONTENT_LENGTH.strVal.trim().equalsIgnoreCase(header[0]))
 				{
-					File resFile = new File(resource.value);
-					contentLength = resFile.length();
-					connection.getOutputStream().write((HttpResponse.Field.HTTP_1_1.strVal + " "	+
-							HttpResponse.ResponseCode.OK_200.strVal + "\n" +
-							HttpResponse.Field.CONTENT_TYPE.strVal + " " +
-							HttpResponse.ContentTypeVal.TEXT_HTML.strVal + "\n" +
-							HttpResponse.Field.CONTENT_LENGTH.strVal + " "+
-							contentLength + "\n" +
-							"\n").getBytes() );
-					if(httpReq.type == HttpRequest.RequestType.GET)
-						copyStreamData(new FileInputStream(resource.value), connection.getOutputStream());
-				}
-				if(resource.type.equalsIgnoreCase(HttpResource.ResourceType.IMAGE_PNG.strVal))
-				{
-					File resFile = new File(resource.value);
-					contentLength = resFile.length();
-					connection.getOutputStream().write((HttpResponse.Field.HTTP_1_1.strVal + " "	+
-							HttpResponse.ResponseCode.OK_200.strVal + "\n" +
-							HttpResponse.Field.CONTENT_TYPE.strVal + " " +
-							HttpResponse.ContentTypeVal.IMAGE_PNG.strVal + "\n" +
-							HttpResponse.Field.CONTENT_LENGTH.strVal + " "+
-							contentLength + "\n" +
-							"\n").getBytes() );
-					if(httpReq.type == HttpRequest.RequestType.GET)
-						copyStreamData(new FileInputStream(resource.value), connection.getOutputStream());
+					contentLength = Long.parseLong(header[1], 10);
+					logger.finest("POST data size:" + contentLength);
+					break;
 				}
 			}
-			else{
-				logger.finer(httpReq.url + " Not Found");
-				send404NotFound(httpReq);
-			}*/
-		}catch(Exception e){
-			logger.finer("Failed to process GET request for httpReq.resourceName");
+			//Ignore rest of the header
+			while((null != (line = reader.readLine()))
+					&&  line.length() != 0);
+			int formDataRead = 0;
+			int fc;
+			int i = 0;
+//			/*Check if it's a 'comment'*/
+//			for(i=0;i<"comment=".length() && (formDataRead < contentLength);i++)
+//			{
+//				fc = reader.read();
+//				formDataRead++;
+//				if(fc != "comment=".charAt(i))
+//				{
+//					/*TODO:Invalid POST*/
+//					return;
+//				}
+//			}
+//			/*if not a 'comment', return*/
+//			if(i != "comment=".length())
+//			{
+//				/*TODO:Invalid POST*/
+//				return;
+//			}
+//			/*Read 'comment'*/
+			byte[] comment = null;
+			if(contentLength > formDataRead)
+			{
+				comment = new byte[(int)(contentLength - formDataRead)];
+			}
+			for(i=0;i<(contentLength-formDataRead);i++)
+			{
+				comment[i] = (byte)reader.read();
+			}
+			/*Save entry in comments db file*/
+			String commentStr = new String(comment);
+			logger.finest("Post data:" + commentStr);
+			String resp = "Thank you for contacting us.";
+			logger.finest("Sending 200OK");
+			connection.getOutputStream().write((HttpResponse.Field.HTTP_1_1.strVal + " "	+
+					HttpResponse.ResponseCode.OK_200.strVal + "\n" +
+					HttpResponse.Field.CONTENT_TYPE.strVal + " " +
+					HttpResponse.ContentTypeVal.TEXT_HTML.strVal + "\n" +
+					HttpResponse.Field.CONTENT_LENGTH.strVal + " "+
+					resp.getBytes().length + "\n" +
+					"\n").getBytes() );
+			connection.getOutputStream().write(resp.getBytes());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
 	}
 	private void send501Unimplemented(HttpRequest httpReq){
 		try {

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/hbadhani.webserver.iml" filepath="$PROJECT_DIR$/hbadhani.webserver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/webserver.filebased.iml" filepath="$PROJECT_DIR$/webserver.filebased.iml" />
     </modules>
   </component>
 </project>

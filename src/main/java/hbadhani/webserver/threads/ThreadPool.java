@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public class ThreadPool implements Executor{
 	private ExecutorService executor;
-	private static Logger logger = Logger.getLogger("webserver.threadpool");
+	private final static Logger logger = Logger.getLogger("hbadhani.webserver.threads.threadpool");
 	
 	public ThreadPool(int nThreads,ThreadFactory threadFactory) {
 		logger.config("nThreads:" + nThreads);

@@ -14,8 +14,8 @@ import hbadhani.webserver.interfaces.ReqProcessor;
  */
 public class HttpRequestProcessor implements ReqProcessor{
 	
-	DaemonThreadPool threadPool;
-	static Logger logger = Logger.getLogger("webserver.HttpRequestProcessor");
+	private DaemonThreadPool threadPool;
+	private final static Logger logger = Logger.getLogger("hbadhani.webserver.http.HttpRequestProcessor");
 
 	/**
 	 * Constructor

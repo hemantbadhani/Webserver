@@ -5,8 +5,8 @@ import java.util.logging.Logger;
 
 public class DaemonThreadFactory implements ThreadFactory {
 
-	static Logger logger = Logger.getLogger("webserver.DaemonThreadFactory");
-	@Override
+	static Logger logger = Logger.getLogger("hbadhani.webserver.threads.DaemonThreadFactory");
+
 	public Thread newThread(Runnable r) {
 		Thread th = new Thread(r);
 		th.setDaemon(true);

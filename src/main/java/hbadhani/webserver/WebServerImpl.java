@@ -8,16 +8,17 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 
 /**
  * This is the main webserver class which starts the server.
  */
 public class WebServerImpl {
+
+	static Logger logger = null;
+	static Handler logFileHandler = null;
+
 	/**
 	 *
 	 * @param fileName Name of .properties file containing configuration details.<br>
@@ -46,6 +47,8 @@ public class WebServerImpl {
 				config.nThreads = Integer.parseInt(val);
 				val = props.getProperty("LogFilePath");
 				config.logFilePath = val;
+				val = props.getProperty("LogLevel");
+				config.logLevel = val;
 				reader.close();
 			} catch (FileNotFoundException ex) {
 				// file does not exist
@@ -64,42 +67,69 @@ public class WebServerImpl {
 	 */
 	public static void main(String[] args)
 	{
-		Logger logger = null;
-		Handler logFileHandler = null;
+
 
 		try
 		{
+			//Register a shutdown hook
+			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+				public void run() {
+					if(null != logger){
+						logger.severe("Shutting down server!");
+					}
+					if(null != logFileHandler){
+						logFileHandler.close();
+					}
+				}
+			}, "Shutdown-Thread"));
+
 			Config config = new WebServerImpl().readConfig("config.properties");
+
 			//Create a logger
-			logger = Logger.getLogger(String.valueOf(WebServerImpl.class));
-			if (!Files.isDirectory(Paths.get(".logs"))){
-				new File(".logs").mkdir();
-			}
+			logger = Logger.getLogger("hbadhani.webserver");
 			File logFile = new File(config.logFilePath);
 			if(!Files.isDirectory(Paths.get(logFile.getParent())))
 				new File(logFile.getParent()).mkdirs();
 			//Add a handler which dumps the logs in a file
 			logFileHandler = new FileHandler(config.logFilePath, false);
+			Formatter formatter = new SimpleFormatter();
+			logFileHandler.setFormatter(formatter);
 			logger.addHandler(logFileHandler);
+
 			//Set log level
-			logger.setLevel(Level.ALL);
-			
+			if("ALL".equalsIgnoreCase(config.logLevel)) {
+				logger.setLevel(Level.ALL);
+			}else if ("SEVERE".equalsIgnoreCase(config.logLevel)){
+				logger.setLevel(Level.SEVERE);
+			}else if ("WARNING".equalsIgnoreCase(config.logLevel)){
+				logger.setLevel(Level.WARNING);
+			}else if ("INFO".equalsIgnoreCase(config.logLevel)) {
+				logger.setLevel(Level.INFO);
+			}else if ("CONFIG".equalsIgnoreCase(config.logLevel)) {
+				logger.setLevel(Level.CONFIG);
+			}else if ("FINE".equalsIgnoreCase(config.logLevel)) {
+				logger.setLevel(Level.FINE);
+			}else if ("FINER".equalsIgnoreCase(config.logLevel)) {
+				logger.setLevel(Level.FINER);
+			}else if ("FINEST".equalsIgnoreCase(config.logLevel)) {
+				logger.setLevel(Level.FINEST);
+			}else{
+				logger.setLevel(Level.OFF);
+			}
+			logger.config("Log file path:" + logFile.getAbsolutePath());
+			logger.config("Log level:" + logger.getLevel().toString());
+
 			NetworkReqListner reqListner = new NetworkReqListner(config.port,new HttpRequestProcessor(config.nThreads));
 			reqListner.listen();			
 				
 		}catch(Exception e){
 			e.printStackTrace();			
 		}
-		finally
-		{
-			logFileHandler.close();			
-		}
-		
-		
 	}
 	private class Config{
 		private int port = 8080;
 		private int nThreads = 1;
 		private String logFilePath = "logs.xml";
+		private String logLevel = "OFF";
 	}
 }
