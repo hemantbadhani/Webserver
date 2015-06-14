@@ -33,7 +33,7 @@ public class WebServerImpl {
 	 * @return
 	 */
 
-	public Config readConfig(String fileName){
+	protected Config readConfig(String fileName){
 		if(null != fileName) {
 			File configFile = new File(fileName);
 			Config config = new Config();
@@ -126,7 +126,7 @@ public class WebServerImpl {
 			e.printStackTrace();			
 		}
 	}
-	private class Config{
+	private static class Config{
 		private int port = 8080;
 		private int nThreads = 1;
 		private String logFilePath = "logs.xml";

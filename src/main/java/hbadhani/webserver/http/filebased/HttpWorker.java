@@ -8,6 +8,7 @@ import hbadhani.webserver.http.HttpRequest;
 import hbadhani.webserver.http.HttpResponse;
 import hbadhani.webserver.interfaces.Connection;
 
+import java.net.URLDecoder;
 import java.util.logging.Logger;
 import java.io.BufferedReader;
 import java.io.File;
@@ -205,18 +206,19 @@ public class HttpWorker implements Runnable{
 //				return;
 //			}
 //			/*Read 'comment'*/
-			byte[] comment = null;
+			byte[] postData = null;
 			if(contentLength > formDataRead)
 			{
-				comment = new byte[(int)(contentLength - formDataRead)];
+				postData = new byte[(int)(contentLength - formDataRead)];
 			}
 			for(i=0;i<(contentLength-formDataRead);i++)
 			{
-				comment[i] = (byte)reader.read();
+				postData[i] = (byte)reader.read();
 			}
 			/*Save entry in comments db file*/
-			String commentStr = new String(comment);
-			logger.finest("Post data:" + commentStr);
+			String data = new String(postData);
+			data = URLDecoder.decode(data, "ISO-8859-1");
+			logger.finest("Post data:" + data);
 			String resp = "Thank you for contacting us.";
 			logger.finest("Sending 200OK");
 			connection.getOutputStream().write((HttpResponse.Field.HTTP_1_1.strVal + " "	+
@@ -224,9 +226,9 @@ public class HttpWorker implements Runnable{
 					HttpResponse.Field.CONTENT_TYPE.strVal + " " +
 					HttpResponse.ContentTypeVal.TEXT_HTML.strVal + "\n" +
 					HttpResponse.Field.CONTENT_LENGTH.strVal + " "+
-					resp.getBytes().length + "\n" +
+					data.getBytes().length + "\n" +
 					"\n").getBytes() );
-			connection.getOutputStream().write(resp.getBytes());
+			connection.getOutputStream().write(data.getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
