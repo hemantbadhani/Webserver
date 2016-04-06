@@ -8,6 +8,11 @@
 
   <name>webserver.filebased</name>
   <url>http://maven.apache.org</url>
+  <scm>
+  	<connection>scm:git:git@github.com:hemantbadhani/Webserver.git</connection>
+	<developerConnection>scm:git:git@github.com:hemantbadhani/Webserver.git</developerConnection>
+	<url>https://github.com/hemantbadhani/Webserver/tree/master</url>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
